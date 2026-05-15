@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "4173:4173"
+    environment:
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    depends_on:
+      - smtp-worker
+
+  smtp-worker:
+    build:
+      context: .
+      dockerfile: apps/smtp-worker/Dockerfile
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      APP_POLL_INTERVAL_MS: ${APP_POLL_INTERVAL_MS:-5000}

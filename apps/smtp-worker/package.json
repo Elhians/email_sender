@@ -1,0 +1,26 @@
+{
+  "name": "@email-sender/smtp-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@email-sender/shared": "0.1.0",
+    "@supabase/supabase-js": "^2.49.8",
+    "dotenv": "^17.4.2",
+    "nodemailer": "^8.0.7",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@types/nodemailer": "^6.4.17",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}
