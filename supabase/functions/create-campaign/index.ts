@@ -1,11 +1,47 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { createCampaignSchema } from "../../../packages/shared/src/index.ts";
+import { z } from "npm:zod";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+const recipientSchema = z.object({
+  email: z.string().email(),
+  mergeData: z
+    .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
+    .default({}),
+});
+
+const campaignModeSchema = z.enum(["send_now", "schedule"]);
+
+const createCampaignSchema = z
+  .object({
+    title: z.string().trim().min(1).max(120),
+    subject: z.string().trim().min(1).max(200),
+    htmlBody: z.string().trim().min(1),
+    recipients: z.array(recipientSchema).min(1),
+    mode: campaignModeSchema,
+    scheduledAt: z.string().datetime().nullable(),
+  })
+  .superRefine((value, context) => {
+    if (value.mode === "schedule" && !value.scheduledAt) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "scheduledAt is required when mode is schedule",
+        path: ["scheduledAt"],
+      });
+    }
+
+    if (value.mode === "send_now" && value.scheduledAt) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "scheduledAt must be empty when mode is send_now",
+        path: ["scheduledAt"],
+      });
+    }
+  });
 
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
