@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "npm:zod";
 
 export const recipientSchema = z.object({
   email: z.string().email(),
